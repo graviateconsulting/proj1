@@ -38,35 +38,48 @@ This guide provides comprehensive instructions for securely deploying the T-Mobi
 2. **Set proper file permissions:**
    ```bash
    find scripts/ -name "*.sh" -exec chmod 755 {} \;
-   chmod 600 scripts/setup-env.sh
    ```
 
 ### Step 2: Configure Secure Environment
 
-1. **Create your secure environment configuration:**
+⚠️ **SECURITY NOTICE**: The repository includes a safe template file (`setup-env.sh.template`) that can be committed to Git. The actual environment file with credentials (`setup-env.sh`) should NEVER be committed.
+
+1. **Create your secure environment configuration from template:**
    ```bash
    cd scripts/
-   cp setup-env.sh my-environment.sh
-   chmod 600 my-environment.sh
+   cp setup-env.sh.template setup-env.sh
+   chmod 600 setup-env.sh
    ```
 
 2. **Edit the environment file with your actual credentials:**
    ```bash
-   # Edit with your secure editor
-   vi my-environment.sh
+   # Edit with your secure editor - replace all YOUR_* placeholders
+   vi setup-env.sh
    ```
 
-3. **Configure the required environment variables:**
-   - Database passwords (will be prompted securely)
-   - Oracle connection details
-   - Email notification addresses
-   - Spark configuration
+3. **Replace ALL placeholder values in setup-env.sh:**
+   - `YOUR_CASSANDRA_HOSTNAME_CLUSTER` → Your actual Cassandra cluster hostnames
+   - `YOUR_CASSANDRA_USERNAME` → Your Cassandra username
+   - `YOUR_CASSANDRA_PASSWORD` → Your Cassandra password
+   - `YOUR_CASSANDRA_CLUSTER_NAME` → Your cluster name
+   - `YOUR_DATACENTER_NAME` → Your datacenter name
+   - `YOUR_ORACLE_HOST:YOUR_PORT/YOUR_SERVICE_NAME` → Your Oracle connection details
+   - `YOUR_ORACLE_USERNAME` → Your Oracle username
+   - `YOUR_ORACLE_PASSWORD` → Your Oracle password
+   - `YOUR_ORACLE_SCHEMA` → Your Oracle schema name
+   - `YOUR_EMAIL@YOUR_DOMAIN.com` → Your notification email
+
+4. **Verify the file is ignored by Git:**
+   ```bash
+   git check-ignore setup-env.sh  # Should output: setup-env.sh
+   git status  # Should NOT show setup-env.sh as modified/untracked
+   ```
 
 ### Step 3: Deploy Securely
 
 1. **Load the secure environment:**
    ```bash
-   source scripts/my-environment.sh
+   source scripts/setup-env.sh
    ```
 
 2. **Validate the setup:**
@@ -165,11 +178,21 @@ The [`config/extract_config.json`](config/extract_config.json) now uses environm
 
 ### Credential Management
 
-1. **Never commit actual credentials to version control**
-2. **Use environment variables for all sensitive data**
-3. **Store environment setup scripts outside the project directory in production**
-4. **Regularly rotate passwords and access keys**
-5. **Use encrypted storage for credential files**
+1. **✅ Template Strategy Implemented**:
+   - Safe template file: `scripts/setup-env.sh.template` (can be committed)
+   - Actual credentials file: `scripts/setup-env.sh` (automatically ignored by Git)
+2. **Never commit actual credentials to version control**
+3. **Use environment variables for all sensitive data**
+4. **Store environment setup scripts outside the project directory in production**
+5. **Regularly rotate passwords and access keys**
+6. **Use encrypted storage for credential files**
+
+#### Template File Security
+
+| File | Git Status | Purpose | Security |
+|------|------------|---------|----------|
+| `scripts/setup-env.sh.template` | ✅ Safe to commit | Template with placeholders | Contains no actual credentials |
+| `scripts/setup-env.sh` | ⛔ Never commit | Actual credentials | Automatically ignored by `.gitignore` |
 
 ### Network Security
 
@@ -269,6 +292,19 @@ echo $SECURE_ENV_LOADED
 source scripts/setup-env.sh
 ```
 
+#### 0. Setup File Issues
+```bash
+# If setup-env.sh doesn't exist, create from template
+cp scripts/setup-env.sh.template scripts/setup-env.sh
+chmod 600 scripts/setup-env.sh
+
+# Edit to replace all YOUR_* placeholders with actual values
+vi scripts/setup-env.sh
+
+# Verify file is properly ignored
+git check-ignore scripts/setup-env.sh
+```
+
 #### 2. Database Connection Failures
 ```bash
 # Check connection configuration
@@ -282,6 +318,7 @@ env | grep -E "ORACLE_|CASSANDRA_" | grep -v PASSWORD
 ```bash
 # Fix script permissions
 find scripts/ -name "*.sh" -exec chmod 755 {} \;
+# Secure the credentials file specifically
 chmod 600 scripts/setup-env.sh
 
 # Fix log file permissions

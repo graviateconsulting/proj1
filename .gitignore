@@ -15,6 +15,9 @@
 environment.*.sh
 scripts/environment.*.sh
 
+# Setup environment files with real credentials (templates are allowed)
+scripts/setup-env.sh
+
 # Configuration files with real credentials (keep templates only)
 **/extract_config.*.json
 !**/extract_config.json
@@ -256,7 +259,7 @@ package-output.log
 # Allow specific template/example files
 !config/extract_config.json
 !production-config/README.md
-!scripts/setup-env.sh
+!scripts/setup-env.sh.template
 !scripts/deploy-secure.sh
 
 # Allow documentation
