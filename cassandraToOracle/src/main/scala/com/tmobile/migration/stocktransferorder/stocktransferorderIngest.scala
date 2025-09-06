@@ -1,4 +1,4 @@
-package com.tmobile.migration.stocktransferorder
+package com.tmobile.dlmIngestion
 
 import com.tmobile.common.{CommonMethods, SchemaDefinition}
 import com.typesafe.config.ConfigFactory

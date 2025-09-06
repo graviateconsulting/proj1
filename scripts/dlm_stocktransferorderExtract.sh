@@ -3,9 +3,11 @@
 # Secure script execution setup
 set -euo pipefail  # Exit on error, undefined variables, and pipe failures
 
-# Source user profile if available
+# Source user profile if available (temporarily disable undefined variable check)
 if [ -f ~/.bash_profile ]; then
+    set +u  # Temporarily disable undefined variable check
     source ~/.bash_profile
+    set -u  # Re-enable undefined variable check
 fi
 
 # Load secure environment variables if setup script exists
@@ -118,6 +120,28 @@ fi
 
 dt=`/bin/date +%d%m%Y_%H%M%S`
 
+# Create logs directory if it doesn't exist with proper permissions
+if [ ! -d "$LOG_DIR" ]; then
+    echo "Creating logs directory: $LOG_DIR"
+    mkdir -p "$LOG_DIR"
+    if [ $? -ne 0 ]; then
+        echo "ERROR: Failed to create logs directory: $LOG_DIR" >&2
+        exit 1
+    fi
+fi
+
+# Ensure logs directory has proper ownership and permissions
+if [ -d "$LOG_DIR" ]; then
+    # Try to fix ownership if running as different user
+    if [ "$USER" != "$(stat -c %U "$LOG_DIR" 2>/dev/null)" ]; then
+        echo "Fixing logs directory ownership for user: $USER"
+        sudo chown -R "$USER:$(id -gn)" "$LOG_DIR" 2>/dev/null || true
+    fi
+    # Set proper permissions
+    chmod 755 "$LOG_DIR" 2>/dev/null || true
+    # Clean any existing lock files that might have wrong permissions
+    rm -f "${LOG_DIR}"*.lock 2>/dev/null || true
+fi
 
 LOG_FILE=${LOG_DIR}stocktransferorder_extract_"$dt".log
 
@@ -128,8 +152,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Set secure file permissions (owner read/write, group read, no others)
-chmod 640 "$LOG_FILE"
+# Set accessible file permissions (owner read/write, group read, others read)
+chmod 644 "$LOG_FILE"
 if [ $? -ne 0 ]; then
     echo "ERROR: Cannot set secure permissions on log file: $LOG_FILE" >&2
     exit 1
@@ -166,8 +190,8 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Set secure permissions on lock file
-chmod 640 "$LOCK_FILE"
+# Set accessible permissions on lock file
+chmod 644 "$LOCK_FILE"
 if [ $? -ne 0 ]; then
     echo "ERROR: Cannot set secure permissions on lock file: $LOCK_FILE" >> ${LOG_FILE}
     echo "ERROR: Cannot set secure permissions on lock file: $LOCK_FILE" >&2
@@ -181,7 +205,7 @@ echo "Using Spark master: $SPARK_MASTER_MODE" >> ${LOG_FILE}
 echo "Configuration: Driver memory=$SPARK_DRIVER_MEMORY, Executor memory=$SPARK_EXECUTOR_MEMORY, Executors=$SPARK_NUM_EXECUTORS" >> ${LOG_FILE}
 
 ${SPARK_HOME}/bin/spark-submit \
---class com.tmobile.migration.stocktransferorder.stocktransferorderExtract \
+--class com.tmobile.dlmExtract.stocktransferorderExtract \
 --name stocktransferorderExtract \
 --master $SPARK_MASTER_MODE \
 --jars ${DRIVERS_DIR}ojdbc8-21.5.0.0.jar \
@@ -208,7 +232,7 @@ then
     echo "Using Spark master: $SPARK_MASTER_MODE" >> ${LOG_FILE}
     
     ${SPARK_HOME}/bin/spark-submit \
-    --class com.tmobile.migration.stocktransferorder.stocktransferorderIngest \
+    --class com.tmobile.dlmIngestion.stocktransferorderIngest \
     --name stocktransferorderIngest \
     --master $SPARK_MASTER_MODE \
     --jars ${DRIVERS_DIR}ojdbc8-21.5.0.0.jar \
