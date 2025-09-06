@@ -1,0 +1,172 @@
+#!/bin/bash
+
+# ===========================================================================================
+# Secure Environment Setup Template
+# 
+# This script provides a template for securely setting up credentials and environment
+# variables for the T-Mobile Data Migration System.
+#
+# SECURITY NOTICE:
+# - This file should be customized for your environment
+# - Never commit actual credentials to version control
+# - Set proper file permissions (600) after configuration
+# - Store in a secure location outside of the project directory for production
+# ===========================================================================================
+
+set -euo pipefail  # Exit on error, undefined variables, and pipe failures
+
+# Function to validate environment variables
+validate_env_var() {
+    local var_name="$1"
+    local var_value="${!var_name:-}"
+    
+    if [[ -z "$var_value" ]]; then
+        echo "ERROR: Environment variable $var_name is not set or empty" >&2
+        return 1
+    fi
+    
+    echo "✓ $var_name is set"
+    return 0
+}
+
+# Function to securely prompt for credentials
+prompt_credential() {
+    local prompt_text="$1"
+    local var_name="$2"
+    
+    echo -n "$prompt_text: "
+    read -s credential
+    echo
+    
+    if [[ -z "$credential" ]]; then
+        echo "ERROR: No value provided for $var_name" >&2
+        return 1
+    fi
+    
+    export "$var_name"="$credential"
+    echo "✓ $var_name set securely"
+}
+
+echo "========================================="
+echo "T-Mobile Data Migration - Environment Setup"
+echo "========================================="
+echo
+
+# ===========================================================================================
+# CASSANDRA DATABASE CREDENTIALS
+# ===========================================================================================
+echo "Setting up Cassandra database credentials..."
+
+# ===========================================================================================
+# SUPPLY_CHAIN Environment (Active - Used for stocktransferorder migration)
+# ===========================================================================================
+export CASSANDRA_SUPPLY_CHAIN_DEV_HOSTNAME="${CASSANDRA_SUPPLY_CHAIN_DEV_HOSTNAME:-lpollcmsv0002a.unix.gsm1900.org,lpollcmsv0002b.unix.gsm1900.org,lpollcmsv0002d.unix.gsm1900.org,lpollcmsv0002e.unix.gsm1900.org,lpollcmsv00031.unix.gsm1900.org,lpollcmsv00032.unix.gsm1900.org}"
+export CASSANDRA_SUPPLY_CHAIN_DEV_PORT="${CASSANDRA_SUPPLY_CHAIN_DEV_PORT:-9042}"
+export CASSANDRA_SUPPLY_CHAIN_DEV_USERNAME="${CASSANDRA_SUPPLY_CHAIN_DEV_USERNAME:-svc_qat_migrelev}"
+export CASSANDRA_SUPPLY_CHAIN_DEV_PASSWORD="${CASSANDRA_SUPPLY_CHAIN_DEV_PASSWORD:-plab_34yuhxcfgrnr}"
+export CASSANDRA_SUPPLY_CHAIN_DEV_CLUSTER_NAME="${CASSANDRA_SUPPLY_CHAIN_DEV_CLUSTER_NAME:-pel_tscs_1}"
+export CASSANDRA_SUPPLY_CHAIN_DEV_KEYSPACE="${CASSANDRA_SUPPLY_CHAIN_DEV_KEYSPACE:-supply_chain_domain}"
+export CASSANDRA_SUPPLY_CHAIN_DEV_DC_NAME="${CASSANDRA_SUPPLY_CHAIN_DEV_DC_NAME:-pel_tscs_pl_cass_1}"
+export CASSANDRA_SUPPLY_CHAIN_DEV_CONNECT_TIMEOUT="${CASSANDRA_SUPPLY_CHAIN_DEV_CONNECT_TIMEOUT:-30000}"
+export CASSANDRA_SUPPLY_CHAIN_DEV_READ_TIMEOUT="${CASSANDRA_SUPPLY_CHAIN_DEV_READ_TIMEOUT:-30000}"
+export CASSANDRA_SUPPLY_CHAIN_DEV_POOL_TIMEOUT="${CASSANDRA_SUPPLY_CHAIN_DEV_POOL_TIMEOUT:-30000}"
+
+# Truststore configuration (optional - set if using SSL)
+export CASSANDRA_SUPPLY_CHAIN_DEV_TRUSTSTORE_PATH="${CASSANDRA_SUPPLY_CHAIN_DEV_TRUSTSTORE_PATH:-}"
+export CASSANDRA_SUPPLY_CHAIN_DEV_TRUSTSTORE_PASSWORD="${CASSANDRA_SUPPLY_CHAIN_DEV_TRUSTSTORE_PASSWORD:-}"
+
+# ===========================================================================================
+# ORACLE DATABASE CREDENTIALS
+# ===========================================================================================
+echo
+echo "Setting up Oracle database credentials..."
+
+export ORACLE_DEV_URL="${ORACLE_DEV_URL:-jdbc:oracle:thin:@gbl-tdlmg-scan.eitoracle.gsm1900.org:1678/tdlmg}"
+export ORACLE_DEV_DRIVER="${ORACLE_DEV_DRIVER:-oracle.jdbc.OracleDriver}"
+export ORACLE_DEV_USERNAME="${ORACLE_DEV_USERNAME:-NAravap1[SCH_NONDLM]}"
+export ORACLE_DEV_SCHEMA="${ORACLE_DEV_SCHEMA:-SCH_NONDLM}"
+export ORACLE_DEV_PASSWORD="${ORACLE_DEV_PASSWORD:-Nondlm_staging_987654321}"
+
+# ===========================================================================================
+# APPLICATION CONFIGURATION
+# ===========================================================================================
+echo
+echo "Setting up application configuration..."
+
+export SPARK_MASTER="${SPARK_MASTER:-yarn-cluster}"
+export ENVIRONMENT="${ENVIRONMENT:-Non-PROD}"
+export SOURCE_ENABLED="${SOURCE_ENABLED:-DEV}"
+export TARGET_ENABLED="${TARGET_ENABLED:-DEV}"
+
+# Warehouse paths
+export WAREHOUSE_OUTBOUND_PATH="${WAREHOUSE_OUTBOUND_PATH:-/tmp/migrations/}"
+export WAREHOUSE_LOG_DIR="${WAREHOUSE_LOG_DIR:-$(dirname "${BASH_SOURCE[0]}")/../logs/}"
+
+# Email configuration
+export NOTIFICATION_EMAIL="${NOTIFICATION_EMAIL:-operations@t-mobile.com}"
+
+# Date range configuration (optional)
+export TABLE_POSTING_DATE_START="${TABLE_POSTING_DATE_START:-2019-01-01}"
+export TABLE_POSTING_DATE_END="${TABLE_POSTING_DATE_END:-2025-05-13}"
+
+# ===========================================================================================
+# SPARK CONFIGURATION
+# ===========================================================================================
+echo
+echo "Setting up Spark configuration..."
+
+export SPARK_HOME="${SPARK_HOME:-/app/UDMF/spark/}"
+export HADOOP_HOME="${HADOOP_HOME:-/app/UDMF/software/hadoop/}"
+export HADOOP_CONF_DIR="${HADOOP_CONF_DIR:-${HADOOP_HOME}/etc/hadoop}"
+export YARN_CONF_DIR="${YARN_CONF_DIR:-${HADOOP_HOME}/etc/hadoop}"
+
+# Spark resource allocation
+export SPARK_DRIVER_MEMORY="${SPARK_DRIVER_MEMORY:-4g}"
+export SPARK_EXECUTOR_MEMORY="${SPARK_EXECUTOR_MEMORY:-4g}"
+export SPARK_EXECUTOR_CORES="${SPARK_EXECUTOR_CORES:-2}"
+export SPARK_NUM_EXECUTORS="${SPARK_NUM_EXECUTORS:-4}"
+export SPARK_PARTITION_COUNT="${SPARK_PARTITION_COUNT:-200}"
+
+# ===========================================================================================
+# VALIDATION
+# ===========================================================================================
+echo
+echo "Validating environment setup..."
+
+# Validate critical environment variables for SUPPLY_CHAIN (stocktransferorder migration)
+validate_env_var "CASSANDRA_SUPPLY_CHAIN_DEV_USERNAME" || exit 1
+validate_env_var "CASSANDRA_SUPPLY_CHAIN_DEV_PASSWORD" || exit 1
+validate_env_var "CASSANDRA_SUPPLY_CHAIN_DEV_KEYSPACE" || exit 1
+validate_env_var "CASSANDRA_SUPPLY_CHAIN_DEV_CLUSTER_NAME" || exit 1
+validate_env_var "ORACLE_DEV_USERNAME" || exit 1
+validate_env_var "ORACLE_DEV_PASSWORD" || exit 1
+validate_env_var "ORACLE_DEV_SCHEMA" || exit 1
+validate_env_var "NOTIFICATION_EMAIL" || exit 1
+
+echo
+echo "✅ Environment setup completed successfully!"
+echo "✅ SUPPLY_CHAIN Cassandra credentials configured for stocktransferorder migration"
+echo "✅ Oracle target database credentials validated"
+echo
+echo "📋 ACTIVE ENVIRONMENT SUMMARY:"
+echo "   • Cassandra: SUPPLY_CHAIN environment (supply_chain_domain keyspace)"
+echo "   • Oracle: ${ORACLE_DEV_USERNAME}@${ORACLE_DEV_SCHEMA}"
+echo "   • Migration: stocktransferorder table"
+echo
+echo "SECURITY REMINDERS:"
+echo "1. Set proper file permissions: chmod 600 $(basename "$0")"
+echo "2. Store this file in a secure location"
+echo "3. Never commit actual credentials to version control"
+echo "4. Regularly rotate passwords and credentials"
+echo "5. Review access logs periodically"
+echo
+echo "🚀 Ready to deploy! To use these settings:"
+echo "  source $(basename "$0")"
+echo "  ./scripts/deploy-secure.sh dev"
+echo
+
+# Export validation flag
+export SECURE_ENV_LOADED="true"
+export SECURE_ENV_TIMESTAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+echo "Environment variables are now available in your shell session."

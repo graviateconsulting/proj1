@@ -1,0 +1,91 @@
+{
+  "sparkMaster": "${SPARK_MASTER}",
+  "environment": "${ENVIRONMENT}",
+  "sourceEnabled": "${SOURCE_ENABLED}",
+  "targetEnabled": "${TARGET_ENABLED}",
+  "warehouse": {
+    "outbound_path": "${WAREHOUSE_OUTBOUND_PATH}",
+    "logdir": "${WAREHOUSE_LOG_DIR}"
+  },
+  "tables": {
+    "serializeddevicehistory_v2": {
+      "postingdateStart": "${TABLE_POSTING_DATE_START}",
+      "postingdateEnd": "${TABLE_POSTING_DATE_END}"
+    },
+    "dualimeiinfo_by_primary_imei": {
+      "postingdateStart": "${TABLE_POSTING_DATE_START}",
+      "postingdateEnd": "${TABLE_POSTING_DATE_END}"
+    },
+    "serializedmaterial": {
+      "postingdateStart": "${TABLE_POSTING_DATE_START}",
+      "postingdateEnd": "${TABLE_POSTING_DATE_END}"
+    },
+    "stockonhand": {
+      "postingdateStart": "${TABLE_POSTING_DATE_START}",
+      "postingdateEnd": "${TABLE_POSTING_DATE_END}"
+    },
+    "stocktransferorder": {
+      "postingdateStart": "${TABLE_POSTING_DATE_START}",
+      "postingdateEnd": "${TABLE_POSTING_DATE_END}"
+    }
+  },
+  "cassandra_source": {
+    "TETRA": {
+      "DEV": {
+        "hostname": "${CASSANDRA_TETRA_DEV_HOSTNAME}",
+        "port": "${CASSANDRA_TETRA_DEV_PORT}",
+        "username": "${CASSANDRA_TETRA_DEV_USERNAME}",
+        "password": "${CASSANDRA_TETRA_DEV_PASSWORD}",
+        "truststorepath": "${CASSANDRA_TETRA_DEV_TRUSTSTORE_PATH}",
+        "truststorepassword": "${CASSANDRA_TETRA_DEV_TRUSTSTORE_PASSWORD}",
+        "cluster_name": "${CASSANDRA_TETRA_DEV_CLUSTER_NAME}",
+        "keyspace": "${CASSANDRA_TETRA_DEV_KEYSPACE}"
+      }
+    },
+    "HP": {
+      "DEV": {
+        "hostname": "${CASSANDRA_HP_DEV_HOSTNAME}",
+        "port": "${CASSANDRA_HP_DEV_PORT}",
+        "username": "${CASSANDRA_HP_DEV_USERNAME}",
+        "password": "${CASSANDRA_HP_DEV_PASSWORD}",
+        "truststorepath": "${CASSANDRA_HP_DEV_TRUSTSTORE_PATH}",
+        "truststorepassword": "${CASSANDRA_HP_DEV_TRUSTSTORE_PASSWORD}",
+        "cluster_name": "${CASSANDRA_HP_DEV_CLUSTER_NAME}",
+        "keyspace": "${CASSANDRA_HP_DEV_KEYSPACE}"
+      }
+    },
+    "SUPPLY_CHAIN": {
+      "DEV": {
+        "hostname": "${CASSANDRA_SUPPLY_CHAIN_DEV_HOSTNAME}",
+        "port": "${CASSANDRA_SUPPLY_CHAIN_DEV_PORT}",
+        "username": "${CASSANDRA_SUPPLY_CHAIN_DEV_USERNAME}",
+        "password": "${CASSANDRA_SUPPLY_CHAIN_DEV_PASSWORD}",
+        "truststorepath": "${CASSANDRA_SUPPLY_CHAIN_DEV_TRUSTSTORE_PATH}",
+        "truststorepassword": "${CASSANDRA_SUPPLY_CHAIN_DEV_TRUSTSTORE_PASSWORD}",
+        "cluster_name": "${CASSANDRA_SUPPLY_CHAIN_DEV_CLUSTER_NAME}",
+        "keyspace": "${CASSANDRA_SUPPLY_CHAIN_DEV_KEYSPACE}",
+        "dc_name": "${CASSANDRA_SUPPLY_CHAIN_DEV_DC_NAME}",
+        "connect_timeout": "${CASSANDRA_SUPPLY_CHAIN_DEV_CONNECT_TIMEOUT}",
+        "read_timeout": "${CASSANDRA_SUPPLY_CHAIN_DEV_READ_TIMEOUT}",
+        "pool_timeout": "${CASSANDRA_SUPPLY_CHAIN_DEV_POOL_TIMEOUT}"
+      }
+    }
+  },
+  "oracle_target": {
+    "DEV": {
+      "url": "${ORACLE_DEV_URL}",
+      "driver": "${ORACLE_DEV_DRIVER}",
+      "username": "${ORACLE_DEV_USERNAME}",
+      "password": "${ORACLE_DEV_PASSWORD}",
+      "schema": "${ORACLE_DEV_SCHEMA}"
+    }
+  },
+  "spark_config": {
+    "partition_count": "${SPARK_PARTITION_COUNT}",
+    "driver_memory": "${SPARK_DRIVER_MEMORY}",
+    "executor_memory": "${SPARK_EXECUTOR_MEMORY}",
+    "executor_cores": "${SPARK_EXECUTOR_CORES}",
+    "num_executors": "${SPARK_NUM_EXECUTORS}"
+  }
+}
+

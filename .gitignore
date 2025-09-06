@@ -1,0 +1,269 @@
+# ===========================================================================================
+# .gitignore for T-Mobile Data Migration System
+# 
+# This file prevents sensitive credentials, build artifacts, and temporary files
+# from being accidentally committed to version control.
+# ===========================================================================================
+
+# ===========================================================================================
+# SECURITY - SENSITIVE FILES (NEVER COMMIT THESE)
+# ===========================================================================================
+
+# Environment configuration files with actual credentials
+*.env
+.env*
+environment.*.sh
+scripts/environment.*.sh
+
+# Configuration files with real credentials (keep templates only)
+**/extract_config.*.json
+!**/extract_config.json
+config/**/production.*
+config/**/prod.*
+production-config/**/*.properties
+production-config/**/*.conf
+production-config/**/*.json
+!production-config/README.md
+
+# Credential and certificate files
+*.pem
+*.p12
+*.jks
+*.keystore
+*.truststore
+*.key
+*.crt
+*.cert
+credentials.*
+secrets.*
+
+# Database connection files
+tnsnames.ora
+sqlnet.ora
+wallet/
+
+# Backup directories that might contain sensitive data
+backups/
+*.backup
+*.bak
+
+# ===========================================================================================
+# SCALA / SBT BUILD ARTIFACTS
+# ===========================================================================================
+
+# SBT specific
+target/
+project/target/
+project/project/target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.cache-main
+.cache-tests
+
+# Generated JAR files (except release artifacts)
+*.jar
+!lib/*.jar
+
+# Assembly plugin
+*-assembly-*.jar
+
+# Scala IDE specific
+.scala_dependencies
+.worksheet
+.metadata
+.cache
+
+# ===========================================================================================
+# SPARK & HADOOP TEMPORARY FILES
+# ===========================================================================================
+
+# Spark specific
+spark-warehouse/
+*.log
+metastore_db/
+derby.log
+checkpoint/
+
+# Hadoop specific
+.snappy-*
+hadoop-*.log
+
+# ===========================================================================================
+# DEVELOPMENT ENVIRONMENT FILES
+# ===========================================================================================
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/settings.json
+.vscode/launch.json
+.metals/
+.bloop/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# NetBeans
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# ===========================================================================================
+# LOG FILES AND TEMPORARY DATA
+# ===========================================================================================
+
+# Application log files
+logs/*.log
+logs/*.log.*
+*.log.*
+*.out
+nohup.out
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.DS_Store
+Thumbs.db
+
+# Process lock files
+*.lock
+*.pid
+
+# ===========================================================================================
+# DATA FILES (MAY CONTAIN SENSITIVE INFORMATION)
+# ===========================================================================================
+
+# CSV data files that might contain PII
+data/
+*.csv
+*.tsv
+*.parquet
+
+# Extracted data files
+extracts/
+migrations/
+output/
+
+# ===========================================================================================
+# OPERATING SYSTEM FILES
+# ===========================================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+
+# Linux
+*~
+
+# ===========================================================================================
+# PACKAGE MANAGERS AND DEPENDENCIES
+# ===========================================================================================
+
+# SBT
+.sbt
+
+# Maven (if used)
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# ===========================================================================================
+# DOCUMENTATION BUILD FILES
+# ===========================================================================================
+
+# Documentation generators
+docs/_build/
+site/
+
+# ===========================================================================================
+# TESTING AND COVERAGE FILES
+# ===========================================================================================
+
+# Test outputs
+test-output/
+test-reports/
+coverage-reports/
+jacoco.exec
+
+# ===========================================================================================
+# DEPLOYMENT AND RUNTIME FILES
+# ===========================================================================================
+
+# Runtime generated files
+pid
+*.pid
+*.seed
+*.pid.lock
+
+# Deployment artifacts (environment-specific)
+deployment/
+deploy/
+releases/
+
+# ===========================================================================================
+# CUSTOM PROJECT EXCLUSIONS
+# ===========================================================================================
+
+# Compiled Scala files specifically for this project
+compile-output.log
+full-build.log
+full-compile.log
+package-output.log
+
+# Archive files that might contain sensitive data
+*.zip
+*.tar.gz
+*.tar.bz2
+*.rar
+!Sep5-1142am.zip
+
+# Temporary backup files created by editors
+*~
+*.swp
+*.swo
+
+# Last deployment backup reference (contains path info)
+.last_backup
+
+# ===========================================================================================
+# ALLOW SPECIFIC FILES (OVERRIDE PATTERNS ABOVE)
+# ===========================================================================================
+
+# Allow specific template/example files
+!config/extract_config.json
+!production-config/README.md
+!scripts/setup-env.sh
+!scripts/deploy-secure.sh
+
+# Allow documentation
+!README.md
+!*.md
+
+# Allow build configuration
+!build.sbt
+!project/build.properties
+!project/plugins.sbt
