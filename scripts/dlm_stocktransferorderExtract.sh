@@ -21,6 +21,7 @@ export SCRIPT_DIR="${SCRIPT_DIR:-${BASE_LOCATION}/scripts/}"
 export CONF_DIR="${CONF_DIR:-${BASE_LOCATION}/config/}"
 export JAR_DIR="${JAR_DIR:-${BASE_LOCATION}/jar/}"
 export LOG_DIR="${LOG_DIR:-${BASE_LOCATION}/logs/}"
+export DRIVERS_DIR="${DRIVERS_DIR:-${BASE_LOCATION}/drivers/}"
 
 # Spark and Hadoop configuration with environment variable support
 export SPARK_HOME="${SPARK_HOME:-/app/UDMF/spark/}"
@@ -85,6 +86,14 @@ validate_environment() {
     if [ ! -f "${JAR_DIR}tetra-elevate-conversion_2.12-1.0.jar" ]; then
         echo "ERROR: Application JAR not found: ${JAR_DIR}tetra-elevate-conversion_2.12-1.0.jar" >> ${LOG_FILE}
         echo "ERROR: Application JAR not found: ${JAR_DIR}tetra-elevate-conversion_2.12-1.0.jar" >&2
+        exit 1
+    fi
+    
+    # Check if Oracle JDBC driver exists
+    if [ ! -f "${DRIVERS_DIR}ojdbc8-21.5.0.0.jar" ]; then
+        echo "ERROR: Oracle JDBC driver not found: ${DRIVERS_DIR}ojdbc8-21.5.0.0.jar" >> ${LOG_FILE}
+        echo "ERROR: Oracle JDBC driver not found: ${DRIVERS_DIR}ojdbc8-21.5.0.0.jar" >&2
+        echo "Please download the Oracle JDBC driver and place it in the drivers/ directory" >&2
         exit 1
     fi
     
@@ -175,6 +184,7 @@ ${SPARK_HOME}/bin/spark-submit \
 --class com.tmobile.migration.stocktransferorder.stocktransferorderExtract \
 --name stocktransferorderExtract \
 --master $SPARK_MASTER_MODE \
+--jars ${DRIVERS_DIR}ojdbc8-21.5.0.0.jar \
 --driver-memory $SPARK_DRIVER_MEMORY \
 --executor-memory $SPARK_EXECUTOR_MEMORY \
 --executor-cores $SPARK_EXECUTOR_CORES \
@@ -201,6 +211,7 @@ then
     --class com.tmobile.migration.stocktransferorder.stocktransferorderIngest \
     --name stocktransferorderIngest \
     --master $SPARK_MASTER_MODE \
+    --jars ${DRIVERS_DIR}ojdbc8-21.5.0.0.jar \
     --driver-memory $SPARK_DRIVER_MEMORY \
     --executor-memory $SPARK_EXECUTOR_MEMORY \
     --executor-cores $SPARK_EXECUTOR_CORES \
